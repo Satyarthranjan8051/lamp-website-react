@@ -25,7 +25,7 @@ const getUsersData = async () => {
     // sign up route
     router.post('/signup', async (req, res) => {
         try {
-            const { firstName, lastname, email, password } = req.body
+            const { firstName, lastName, email, password } = req.body
 
             // check if user already exists
             const users = await getUsersData()

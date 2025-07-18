@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": "62a94978-45e1-493e-bc52-bcfeae11cc76",
+    "firstName": "Abhinav",
+    "lastName": "Sharma",
+    "email": "test@example.com",
+    "password": "$2b$12$MW3di54dkiupquvMfZH2FOaSNn2giYbwbF1lQOVNsFj8g.wCFXLsq",
+    "createdAt": "2025-07-18T14:31:44.056Z"
+  }
+]
