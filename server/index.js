@@ -3,7 +3,13 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import authRoutes from './routes/auth.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 dotenv.config()
 
@@ -33,6 +39,16 @@ app.use(express.urlencoded({ extended: true }))
 
 // auth routes 
 app.use('/api/auth', authRoutes)
+
+// Test endpoint
+app.get('/api/test', (req, res) => {
+    res.json({ 
+        success: true,
+        message: "Backend is working!",
+        timestamp: new Date().toISOString(),
+        server: "SunLight Lamp Website API"
+    })
+})
 
 // Sample data
 const products = [
@@ -182,7 +198,7 @@ app.get('/api/products/featured', (req, res) => {
 
 // Newsletter subscription
 app.post('/api/newsletter', (req, res) => {
-  const { email } = req.body
+  const { email, preferences } = req.body
   
   if (!email) {
     return res.status(400).json({
@@ -200,14 +216,166 @@ app.post('/api/newsletter', (req, res) => {
     })
   }
   
-  // Here you would typically save to database
-  console.log('Newsletter subscription:', email)
+  try {
+    // Read existing subscribers
+    const subscribersPath = path.join(__dirname, 'data', 'newsletter-subscribers.json')
+    let subscribers = []
+    
+    if (fs.existsSync(subscribersPath)) {
+      const subscribersData = fs.readFileSync(subscribersPath, 'utf8')
+      subscribers = JSON.parse(subscribersData)
+    }
+    
+    // Check if email already exists
+    const existingSubscriber = subscribers.find(sub => sub.email === email)
+    if (existingSubscriber) {
+      return res.status(409).json({
+        success: false,
+        message: 'This email is already subscribed to our newsletter'
+      })
+    }
+    
+    // Create new subscriber
+    const newSubscriber = {
+      id: Date.now().toString(),
+      email: email,
+      preferences: preferences || {
+        weeklyDeals: true,
+        newProducts: true,
+        designTips: false,
+        homeDecor: false
+      },
+      subscribedAt: new Date().toISOString(),
+      isActive: true,
+      confirmationToken: Math.random().toString(36).substring(2, 15),
+      isConfirmed: false
+    }
+    
+    // Add to subscribers array
+    subscribers.push(newSubscriber)
+    
+    // Save to file
+    fs.writeFileSync(subscribersPath, JSON.stringify(subscribers, null, 2))
+    
+    console.log('Newsletter subscription:', {
+      email: email,
+      preferences: newSubscriber.preferences,
+      subscribedAt: newSubscriber.subscribedAt
+    })
+    
+    res.json({
+      success: true,
+      message: 'Successfully subscribed to newsletter! Please check your email to confirm.',
+      subscriber: {
+        email: newSubscriber.email,
+        preferences: newSubscriber.preferences,
+        subscribedAt: newSubscriber.subscribedAt
+      }
+    })
+    
+  } catch (error) {
+    console.error('Newsletter subscription error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error. Please try again later.'
+    })
+  }
+})
+
+// Newsletter confirmation
+app.get('/api/newsletter/confirm/:token', (req, res) => {
+  const { token } = req.params
   
-  res.json({
-    success: true,
-    message: 'Successfully subscribed to newsletter',
-    email: email
-  })
+  try {
+    const subscribersPath = path.join(__dirname, 'data', 'newsletter-subscribers.json')
+    
+    if (!fs.existsSync(subscribersPath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'Subscription not found'
+      })
+    }
+    
+    const subscribersData = fs.readFileSync(subscribersPath, 'utf8')
+    const subscribers = JSON.parse(subscribersData)
+    
+    const subscriberIndex = subscribers.findIndex(sub => sub.confirmationToken === token)
+    
+    if (subscriberIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Invalid confirmation token'
+      })
+    }
+    
+    // Update subscriber as confirmed
+    subscribers[subscriberIndex].isConfirmed = true
+    subscribers[subscriberIndex].confirmedAt = new Date().toISOString()
+    
+    fs.writeFileSync(subscribersPath, JSON.stringify(subscribers, null, 2))
+    
+    res.json({
+      success: true,
+      message: 'Email confirmed successfully! Welcome to SunLight Newsletter.'
+    })
+    
+  } catch (error) {
+    console.error('Newsletter confirmation error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    })
+  }
+})
+
+// Get newsletter statistics (admin only)
+app.get('/api/newsletter/stats', (req, res) => {
+  try {
+    const subscribersPath = path.join(__dirname, 'data', 'newsletter-subscribers.json')
+    
+    if (!fs.existsSync(subscribersPath)) {
+      return res.json({
+        success: true,
+        stats: {
+          totalSubscribers: 0,
+          confirmedSubscribers: 0,
+          pendingConfirmation: 0,
+          recentSubscriptions: []
+        }
+      })
+    }
+    
+    const subscribersData = fs.readFileSync(subscribersPath, 'utf8')
+    const subscribers = JSON.parse(subscribersData)
+    
+    const stats = {
+      totalSubscribers: subscribers.length,
+      confirmedSubscribers: subscribers.filter(sub => sub.isConfirmed).length,
+      pendingConfirmation: subscribers.filter(sub => !sub.isConfirmed).length,
+      activeSubscribers: subscribers.filter(sub => sub.isActive).length,
+      recentSubscriptions: subscribers
+        .sort((a, b) => new Date(b.subscribedAt) - new Date(a.subscribedAt))
+        .slice(0, 10)
+        .map(sub => ({
+          email: sub.email,
+          subscribedAt: sub.subscribedAt,
+          isConfirmed: sub.isConfirmed,
+          preferences: sub.preferences
+        }))
+    }
+    
+    res.json({
+      success: true,
+      stats: stats
+    })
+    
+  } catch (error) {
+    console.error('Newsletter stats error:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    })
+  }
 })
 
 // Contact form
