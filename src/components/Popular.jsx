@@ -2,12 +2,15 @@ import { useEffect, useRef } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 import { useCart } from '../context/CartContext'
+import { useNavigate } from 'react-router-dom'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
+import '../styles/swiper-custom.css'
 
 const Popular = () => {
   const { addToCart, getItemQuantity } = useCart()
+  const navigate = useNavigate()
   const popularProducts = [
     {
       id: 1,
@@ -59,37 +62,39 @@ const Popular = () => {
           </p>
         </div>
 
-        <div className="popular__container">
-          <Swiper
-            modules={[Navigation, Pagination, Autoplay]}
-            spaceBetween={30}
-            slidesPerView={1}
-            centeredSlides={true}
-            autoplay={{
-              delay: 3000,
-              disableOnInteraction: false,
-            }}
-            pagination={{ clickable: true }}
-            navigation={true}
-            breakpoints={{
-              640: {
-                slidesPerView: 2,
-                centeredSlides: false,
-              },
-              768: {
-                slidesPerView: 2,
-                centeredSlides: false,
-              },
-              1024: {
-                slidesPerView: 3,
-                centeredSlides: false,
-              },
-            }}
-            className="mySwiper"
-          >
+        <div className="popular__container pb-16">
+          <div className="swiper-custom-styles">
+            <Swiper
+              modules={[Navigation, Pagination, Autoplay]}
+              spaceBetween={30}
+              slidesPerView={1}
+              centeredSlides={true}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+              }}
+              pagination={{ clickable: true }}
+              navigation={true}
+              breakpoints={{
+                640: {
+                  slidesPerView: 2,
+                  centeredSlides: false,
+                },
+                768: {
+                  slidesPerView: 2,
+                  centeredSlides: false,
+                },
+                1024: {
+                  slidesPerView: 3,
+                  centeredSlides: false,
+                },
+              }}
+              className="mySwiper"
+              style={{ paddingBottom: '50px' }}
+            >
             {popularProducts.map((product) => (
               <SwiperSlide key={product.id}>
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
                   <div className="relative mb-6">
                     <img
                       src={product.image}
@@ -101,8 +106,8 @@ const Popular = () => {
                     </div>
                   </div>
                   
-                  <div className="text-center">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <div className="text-center flex-1 flex flex-col">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 min-h-[3.5rem] flex items-center justify-center">
                       {product.name}
                     </h3>
                     
@@ -118,14 +123,14 @@ const Popular = () => {
                       <span className="text-sm text-gray-600 dark:text-gray-400">({product.rating})</span>
                     </div>
                     
-                    <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className="flex items-center justify-center gap-3 mb-4 flex-1">
                       <span className="text-xl font-bold text-primary-500">${product.price}</span>
                       <span className="text-sm text-gray-500 line-through">${product.originalPrice}</span>
                     </div>
                     
                     <button 
                       onClick={() => addToCart(product)}
-                      className="w-full bg-hero-gradient text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                      className="w-full bg-hero-gradient text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mt-auto"
                     >
                       <i className="ri-shopping-cart-line"></i>
                       {getItemQuantity(product.id) > 0 ? `In Cart (${getItemQuantity(product.id)})` : 'Add to Cart'}
@@ -135,6 +140,18 @@ const Popular = () => {
               </SwiperSlide>
             ))}
           </Swiper>
+          </div>
+        </div>
+
+        {/* View All Products Button */}
+        <div className="text-center mt-8">
+          <button 
+            onClick={() => navigate('/products')}
+            className="bg-hero-gradient text-white px-8 py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto font-medium"
+          >
+            <span>View All Products</span>
+            <i className="ri-arrow-right-line"></i>
+          </button>
         </div>
       </div>
     </section>
