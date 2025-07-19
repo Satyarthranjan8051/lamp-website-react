@@ -43,8 +43,20 @@ class ApiService {
   }
 
   // Newsletter subscription
-  static subscribeNewsletter(email) {
-    return this.post('/newsletter', { email })
+  static subscribeNewsletter(data) {
+    // Support both old format (just email) and new format (email + preferences)
+    const payload = typeof data === 'string' ? { email: data } : data
+    return this.post('/newsletter', payload)
+  }
+
+  // Newsletter confirmation
+  static confirmNewsletter(token) {
+    return this.get(`/newsletter/confirm/${token}`)
+  }
+
+  // Newsletter statistics
+  static getNewsletterStats() {
+    return this.get('/newsletter/stats')
   }
 
   // Contact form

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
+import { AuthProvider } from './context/AuthContext'
 import Header from './components/Header'
 import Home from './components/Home'
 import Popular from './components/Popular'
@@ -11,6 +12,12 @@ import Footer from './components/Footer'
 import QuickCart from './components/QuickCart'
 import CartPage from './components/CartPage'
 import CheckoutPage from './components/CheckoutPage'
+import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
+import Orders from './pages/Orders'
+import Profile from './pages/Profile'
+import ProductsPage from './pages/ProductsPage'
+import NewsletterAdmin from './pages/NewsletterAdmin'
 import ScrollReveal from 'scrollreveal'
 
 function App() {
@@ -49,30 +56,38 @@ function App() {
   }
 
   return (
-    <CartProvider>
-      <Router>
-        <div className={`${darkMode ? 'dark' : ''}`}>
-          <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <Routes>
-            <Route path="/" element={
-              <>
-                <main className="main">
-                  <Home />
-                  <Popular />
-                  <Choose />
-                  <Products />
-                  <Join />
-                </main>
-                <Footer />
-                <QuickCart />
-              </>
-            } />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
-          </Routes>
-        </div>
-      </Router>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <Router>
+          <div className={`${darkMode ? 'dark' : ''}`}>
+            <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Routes>
+              <Route path="/" element={
+                <>
+                  <main className="main">
+                    <Home />
+                    <Popular />
+                    <Choose />
+                    <Products />
+                    <Join />
+                  </main>
+                  <Footer />
+                  <QuickCart />
+                </>
+              } />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/newsletter-admin" element={<NewsletterAdmin />} />
+            </Routes>
+          </div>
+        </Router>
+      </CartProvider>
+    </AuthProvider>
   )
 }
 
