@@ -22,10 +22,26 @@ const getUsersData = async () => {
         await fs.writeJSON('./data/users.json', users, { spaces: 2})
     }
 
+    // generate verification token
+    const generateVerificationToken = () => {
+        return Math.random().toString(36).substring(2, 8).toUpperCase()
+    }
+
+    // validate email format
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        return emailRegex.test(email)
+    }
+
     // sign up route
     router.post('/signup', async (req, res) => {
         try {
             const { firstName, lastName, email, password } = req.body
+
+            // validate email format
+            if (!isValidEmail(email)) {
+                return res.status(400).json({ message: 'Please enter a valid email address' })
+            }
 
             // check if user already exists
             const users = await getUsersData()
@@ -44,6 +60,9 @@ const getUsersData = async () => {
                 lastName,
                 email,
                 password: hashedPassword,
+                emailVerified: false,
+                emailVerificationToken: generateVerificationToken(),
+                emailVerificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
                 createdAt: new Date().toISOString()
             }
 
@@ -112,6 +131,83 @@ const getUsersData = async () => {
             })
         } catch (error) {
             console.error('Signin error:', error)
+            res.status(500).json({ message: 'Server error' })
+        }
+    })
+
+    // send verification email route
+    router.post('/send-verification', async (req, res) => {
+        try {
+            const { email } = req.body
+
+            const users = await getUsersData()
+            const user = users.find(user => user.email === email)
+
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' })
+            }
+
+            if (user.emailVerified) {
+                return res.status(400).json({ message: 'Email is already verified' })
+            }
+
+            // Generate new verification token
+            const verificationToken = generateVerificationToken()
+            user.emailVerificationToken = verificationToken
+            user.emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
+            await saveUsersData(users)
+
+            // In a real app, you would send this via email service (SendGrid, etc.)
+            // For demo purposes, we'll return the token in the response
+            res.json({ 
+                message: 'Verification email sent successfully',
+                verificationToken: verificationToken // Remove this in production
+            })
+
+        } catch (error) {
+            console.error('Send verification error:', error)
+            res.status(500).json({ message: 'Server error' })
+        }
+    })
+
+    // verify email route
+    router.post('/verify-email', async (req, res) => {
+        try {
+            const { email, token } = req.body
+
+            const users = await getUsersData()
+            const userIndex = users.findIndex(user => user.email === email)
+
+            if (userIndex === -1) {
+                return res.status(404).json({ message: 'User not found' })
+            }
+
+            const user = users[userIndex]
+
+            if (user.emailVerified) {
+                return res.status(400).json({ message: 'Email is already verified' })
+            }
+
+            if (user.emailVerificationToken !== token) {
+                return res.status(400).json({ message: 'Invalid verification token' })
+            }
+
+            if (new Date() > new Date(user.emailVerificationExpires)) {
+                return res.status(400).json({ message: 'Verification token has expired' })
+            }
+
+            // Verify the email
+            users[userIndex].emailVerified = true
+            users[userIndex].emailVerificationToken = null
+            users[userIndex].emailVerificationExpires = null
+
+            await saveUsersData(users)
+
+            res.json({ message: 'Email verified successfully' })
+
+        } catch (error) {
+            console.error('Verify email error:', error)
             res.status(500).json({ message: 'Server error' })
         }
     })
