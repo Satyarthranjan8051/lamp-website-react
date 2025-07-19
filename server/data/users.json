@@ -4,7 +4,23 @@
     "firstName": "Abhinav",
     "lastName": "Sharma",
     "email": "test@example.com",
-    "password": "$2b$12$MW3di54dkiupquvMfZH2FOaSNn2giYbwbF1lQOVNsFj8g.wCFXLsq",
-    "createdAt": "2025-07-18T14:31:44.056Z"
+    "password": "$2b$12$.m2aHMoKpeRecRw.EPX45.IspKLQo5wDXwZ2lBWx0VNBRA0.s02.S",
+    "createdAt": "2025-07-19T12:10:57.225Z"
+  },
+  {
+    "id": "8d73b9cb-0905-446f-a38f-e6f4381e5106",
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "password": "$2b$12$.m2aHMoKpeRecRw.EPX45.IspKLQo5wDXwZ2lBWx0VNBRA0.s02.S",
+    "createdAt": "2025-07-19T12:10:57.227Z"
+  },
+  {
+    "id": "8e904916-d8fd-48ae-a860-2644f40dd98f",
+    "firstName": "Satyarth",
+    "lastName": "Ranjan",
+    "email": "satyarthrdx@gmail.com",
+    "password": "$2b$12$tNIX3ACYOKW9x9UcxiTN9.xH0N0BHMDhvVzOIfn/1qhVs7cnHreQW",
+    "createdAt": "2025-07-19T13:05:17.807Z"
   }
 ]
