@@ -149,8 +149,10 @@ npm run build
 
 ```
 lamp-website-react/
-├── 📂 src/
-│   ├── 📂 components/           # React components
+├── 📂 .github/                 # GitHub workflows and templates
+├── 📂 .vscode/                 # VS Code workspace settings
+├── 📂 src/                     # Frontend source code
+│   ├── 📂 components/          # React components
 │   │   ├── Header.jsx          # Navigation with auth integration
 │   │   ├── Home.jsx            # Hero section
 │   │   ├── Popular.jsx         # Featured products carousel
@@ -159,9 +161,15 @@ lamp-website-react/
 │   │   ├── Join.jsx            # Newsletter with preferences
 │   │   ├── Footer.jsx          # Footer section
 │   │   ├── QuickCart.jsx       # Sliding cart component
+│   │   ├── Cart.jsx            # Cart component
 │   │   ├── CartPage.jsx        # Full cart page
+│   │   ├── CartPageNew.jsx     # Updated cart page
+│   │   ├── CartPageTest.jsx    # Cart page testing
 │   │   ├── CheckoutPage.jsx    # Checkout process
-│   │   └── ProductModal.jsx    # Product quick view modal
+│   │   ├── ProductModal.jsx    # Product quick view modal
+│   │   ├── ProtectedRoute.jsx  # Route protection component
+│   │   ├── SignIn.jsx          # Sign in component (legacy)
+│   │   └── SignUp.jsx          # Sign up component (legacy)
 │   ├── 📂 pages/               # Route pages
 │   │   ├── SignIn.jsx          # User login page
 │   │   ├── SignUp.jsx          # User registration page
@@ -170,37 +178,68 @@ lamp-website-react/
 │   │   ├── ProductsPage.jsx    # Complete product catalog
 │   │   └── NewsletterAdmin.jsx # Newsletter dashboard
 │   ├── 📂 context/             # React Context providers
-│   │   ├── CartContext.jsx     # Shopping cart state
-│   │   └── AuthContext.jsx     # Authentication state
+│   │   ├── CartContext.jsx     # Shopping cart state management
+│   │   └── AuthContext.jsx     # Authentication state management
 │   ├── 📂 services/            # API services
 │   │   └── api.js              # API communication layer
 │   ├── 📂 styles/              # Custom styles
 │   │   └── swiper-custom.css   # Swiper customizations
 │   ├── 📂 assets/              # Static assets
-│   │   └── img/                # Product images
-│   ├── App.jsx                 # Main app component
+│   │   └── 📂 img/             # Product images and graphics
+│   ├── App.jsx                 # Main app component with routing
 │   ├── main.jsx               # App entry point
-│   └── index.css              # Global styles
+│   └── index.css              # Global styles and animations
 ├── 📂 server/                  # Backend application
-│   ├── 📂 routes/              # API routes
-│   │   └── auth.js             # Authentication endpoints
+│   ├── 📂 routes/              # API route handlers
+│   │   ├── auth.js             # Authentication endpoints
+│   │   └── orders.js           # Order management endpoints
+│   ├── 📂 middleware/          # Express middleware
+│   │   └── auth.js             # Authentication middleware
 │   ├── 📂 data/                # JSON data storage
-│   │   ├── users.json          # User accounts
-│   │   ├── products.json       # Product catalog
-│   │   └── newsletter-subscribers.json # Newsletter data
-│   ├── 📂 utilities/           # Development tools
-│   │   ├── create-demo-users.js # Demo data generator
-│   │   ├── test-password.js    # Password testing
-│   │   ├── test-server.js      # Server connectivity test
-│   │   └── update-users-verification.js # User data updater
-│   ├── index.js               # Express server
-│   └── package.json           # Backend dependencies
-├── 📂 public/                  # Static public files
-├── package.json               # Frontend dependencies
-├── vite.config.js             # Vite configuration
-├── tailwind.config.js         # Tailwind customizations
-└── README.md                  # Project documentation
-```
+│   │   ├── users.json          # User accounts database
+│   │   ├── orders.json         # Orders database
+│   │   └── newsletter-subscribers.json # Newsletter subscribers
+│   ├── 📂 node_modules/        # Backend dependencies
+│   ├── index.js               # Express server configuration
+│   ├── package.json           # Backend dependencies
+│   ├── package-lock.json      # Backend dependency lock
+│   ├── .env                   # Environment variables
+│   ├── create-demo-users.js   # Demo data generator
+│   ├── test-password.js       # Password testing utility
+│   ├── test-server.js         # Server connectivity test
+│   └── update-users-verification.js # User data updater
+├── 📂 node_modules/            # Frontend dependencies
+├── 📁 Configuration Files      # Project configuration
+│   ├── package.json           # Frontend dependencies and scripts
+│   ├── package-lock.json      # Frontend dependency lock
+│   ├── vite.config.js         # Vite build configuration
+│   ├── tailwind.config.js     # Tailwind CSS customizations
+│   ├── postcss.config.js      # PostCSS configuration
+│   ├── eslint.config.js       # ESLint configuration
+│   ├── .gitignore             # Git ignore rules
+│   └── index.html             # HTML template
+### 📂 **Folder Organization Principles**
+
+- **`/components/`**: Reusable UI components and layout elements
+- **`/pages/`**: Route-specific page components for React Router
+- **`/context/`**: React Context providers for global state management
+- **`/services/`**: API communication and external service integrations
+- **`/styles/`**: Custom CSS files and component-specific styling
+- **`/assets/`**: Static assets like images, icons, and media files
+
+### 🏗️ **Backend Architecture**
+
+- **`/routes/`**: Express route handlers organized by feature
+- **`/middleware/`**: Custom Express middleware for authentication and validation
+- **`/data/`**: JSON-based data storage for development (easily replaceable with database)
+- **Utility Scripts**: Development tools for testing and data management
+
+### 🔧 **Development vs Production**
+
+The project is structured to support easy migration from development to production:
+- **Development**: Uses JSON files for data storage
+- **Production Ready**: Middleware and API structure ready for database integration
+- **Environment Configs**: Separate configurations for different environments
 
 ## 🎨 Design System & Theming
 
@@ -253,23 +292,29 @@ lamp-website-react/
 
 ## 🔌 API Endpoints
 
-### Authentication Routes
+### Authentication Routes (`/api/auth/`)
 - `POST /api/auth/signup` - User registration with email verification
 - `POST /api/auth/signin` - User login with JWT token generation
 - `POST /api/auth/send-verification` - Send email verification token
 - `POST /api/auth/verify-email` - Verify email address with token
 
-### Product Routes
+### Product Routes (`/api/products/`)
 - `GET /api/products` - Get all products with optional filtering
 - `GET /api/products/featured` - Get featured/popular products
 - `GET /api/products/:id` - Get single product by ID
 
-### Newsletter Routes
+### Order Routes (`/api/orders/`)
+- `GET /api/orders` - Get user's order history
+- `POST /api/orders` - Create new order
+- `GET /api/orders/:id` - Get specific order details
+- `PUT /api/orders/:id` - Update order status
+
+### Newsletter Routes (`/api/newsletter/`)
 - `POST /api/newsletter` - Subscribe with preferences (deals, products, tips, decor)
 - `GET /api/newsletter/confirm/:token` - Confirm newsletter subscription
 - `GET /api/newsletter/stats` - Get newsletter statistics (admin)
 
-### Contact & Support
+### Contact & Support (`/api/contact/`)
 - `POST /api/contact` - Submit contact form with user inquiries
 
 ### Request/Response Examples
@@ -284,6 +329,25 @@ POST /api/auth/signup
   "password": "password123"
 }
 // Response: { token, user: { id, firstName, lastName, email } }
+```
+
+#### Create Order
+```javascript
+POST /api/orders
+{
+  "items": [
+    { "productId": 1, "quantity": 2, "price": 89.99 },
+    { "productId": 3, "quantity": 1, "price": 69.99 }
+  ],
+  "shippingAddress": {
+    "street": "123 Main St",
+    "city": "Anytown", 
+    "state": "CA",
+    "zipCode": "12345"
+  },
+  "totalAmount": 249.97
+}
+// Response: { orderId, status: "pending", estimatedDelivery }
 ```
 
 #### Newsletter Subscription
@@ -475,14 +539,19 @@ node test-server.js
 
 ## 📊 Project Statistics
 
-- **Total Components**: 20+ React components
-- **API Endpoints**: 12 RESTful endpoints
-- **Authentication**: JWT + bcrypt secure authentication
-- **Database**: JSON file-based storage (development)
-- **Styling**: 1000+ Tailwind utility classes
-- **Animations**: 10+ custom CSS animations
-- **Responsive Breakpoints**: 5 responsive design breakpoints
-- **Browser Support**: Modern browsers (Chrome, Firefox, Safari, Edge)
+- **Total Components**: 25+ React components (17 in components/, 6 in pages/, 2 contexts)
+- **API Endpoints**: 15+ RESTful endpoints across 4 route categories
+- **Authentication**: JWT + bcrypt secure authentication with middleware
+- **Database**: JSON file-based storage (users, orders, newsletter subscribers)
+- **Styling**: 1000+ Tailwind utility classes with custom animations
+- **Animations**: 10+ custom CSS animations and transitions
+- **Routes**: 8 main application routes with protected routes
+- **Backend Middleware**: Custom authentication and security middleware
+- **File Structure**: Well-organized modular architecture
+- **Configuration Files**: 7 configuration files for build tools and linting
+- **Development Tools**: 4 utility scripts for testing and data management
+- **Responsive Breakpoints**: 5 responsive design breakpoints (sm, md, lg, xl, 2xl)
+- **Browser Support**: Modern browsers (Chrome 88+, Firefox 85+, Safari 14+, Edge 88+)
 
 ## 🤝 Contributing
 
