@@ -7,6 +7,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import authRoutes from './routes/auth.js'
+import cartRoutes from './routes/cart.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -39,6 +40,9 @@ app.use(express.urlencoded({ extended: true }))
 
 // auth routes 
 app.use('/api/auth', authRoutes)
+
+// cart routes
+app.use('/api/cart', cartRoutes)
 
 // Test endpoint
 app.get('/api/test', (req, res) => {

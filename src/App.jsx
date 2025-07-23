@@ -12,6 +12,7 @@ import Footer from './components/Footer'
 import QuickCart from './components/QuickCart'
 import CartPage from './components/CartPage'
 import CheckoutPage from './components/CheckoutPage'
+import CartSyncIndicator from './components/CartSyncIndicator'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import Orders from './pages/Orders'
@@ -84,6 +85,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/newsletter-admin" element={<NewsletterAdmin />} />
             </Routes>
+            <CartSyncIndicator />
           </div>
         </Router>
       </CartProvider>
