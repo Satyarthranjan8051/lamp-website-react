@@ -8,6 +8,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import authRoutes from './routes/auth.js'
 import cartRoutes from './routes/cart.js'
+import authenticateToken from './middleware/auth.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -129,6 +130,21 @@ const products = [
     featured: false
   }
 ]
+
+// Orders data file path
+const ORDERS_DATA_PATH = path.join(__dirname, 'data', 'orders.json')
+
+// Helper to load orders
+const loadOrders = () => {
+  if (!fs.existsSync(ORDERS_DATA_PATH)) return []
+  const data = fs.readFileSync(ORDERS_DATA_PATH, 'utf8')
+  return data ? JSON.parse(data) : []
+}
+
+// Helper to save orders
+const saveOrders = (orders) => {
+  fs.writeFileSync(ORDERS_DATA_PATH, JSON.stringify(orders, null, 2))
+}
 
 // Routes
 app.get('/', (req, res) => {
@@ -403,56 +419,37 @@ app.post('/api/contact', (req, res) => {
 })
 
 // Checkout/Order endpoint
-app.post('/api/checkout', (req, res) => {
+app.post('/api/checkout', authenticateToken, (req, res) => {
   const { customerInfo, items, total } = req.body
-  
   if (!customerInfo || !items || items.length === 0) {
-    return res.status(400).json({
-      success: false,
-      message: 'Customer information and items are required'
-    })
+    return res.status(400).json({ success: false, message: 'Customer information and items are required' })
   }
-  
-  // Generate order ID
   const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-  
-  // Here you would typically:
-  // 1. Process payment
-  // 2. Save order to database
-  // 3. Send confirmation emails
-  // 4. Update inventory
-  
-  console.log('New order:', {
-    orderId,
+  const userId = req.user?.id || customerInfo.email || 'guest'
+  const newOrder = {
+    id: orderId,
+    userId,
     customer: customerInfo,
     items,
     total,
-    timestamp: new Date().toISOString()
-  })
-  
-  res.json({
-    success: true,
-    message: 'Order placed successfully',
-    orderId,
+    status: 'pending',
+    date: new Date().toISOString(),
     estimatedDelivery: '5-7 business days'
-  })
+  }
+  const orders = loadOrders()
+  orders.push(newOrder)
+  saveOrders(orders)
+  res.json({ success: true, message: 'Order placed successfully', orderId, estimatedDelivery: newOrder.estimatedDelivery })
 })
 
-// Get order status
-app.get('/api/orders/:orderId', (req, res) => {
-  const { orderId } = req.params
-  
-  // Here you would typically fetch from database
-  res.json({
-    success: true,
-    data: {
-      orderId,
-      status: 'processing',
-      estimatedDelivery: '5-7 business days',
-      trackingNumber: `TRK${orderId.slice(-8)}`,
-      items: []
-    }
-  })
+// Get all orders for authenticated user
+app.get('/api/orders', authenticateToken, (req, res) => {
+  const userId = req.user?.id
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' })
+  }
+  const orders = loadOrders().filter(order => order.userId === userId)
+  res.json({ success: true, orders })
 })
 
 // 404 handler
