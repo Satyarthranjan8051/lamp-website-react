@@ -12,13 +12,17 @@ class ApiService {
     }
   }
 
-  static async post(endpoint, data) {
+  static async post(endpoint, data, token = null) {
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(data),
       })
       const result = await response.json()
