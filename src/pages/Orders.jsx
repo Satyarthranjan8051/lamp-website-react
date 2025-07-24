@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Link } from 'react-router-dom'
+import ApiService from '../services/api'
 
 const Orders = () => {
     const { user, isAuthenticated } = useAuth()
@@ -17,54 +18,23 @@ const Orders = () => {
     const fetchOrders = async () => {
         try {
             setLoading(true)
-            // In a real app, this would be an API call
-            // For now, we'll simulate some demo orders
-            const demoOrders = [
-                {
-                    id: 'ORD-001',
-                    date: '2025-07-18',
-                    status: 'delivered',
-                    total: 129.99,
-                    items: [
-                        {
-                            id: 1,
-                            name: 'Modern Industrial Lamp',
-                            image: '/src/assets/img/industrial-lamp.png',
-                            quantity: 1,
-                            price: 89.99
-                        },
-                        {
-                            id: 2,
-                            name: 'Ultrawide Desk Lamp',
-                            image: '/src/assets/img/ultrawide-lamp.png',
-                            quantity: 1,
-                            price: 40.00
-                        }
-                    ],
-                    shippingAddress: '123 Main St, City, State 12345',
-                    trackingNumber: 'TRK12345'
-                },
-                {
-                    id: 'ORD-002',
-                    date: '2025-07-19',
-                    status: 'pending',
-                    total: 249.99,
-                    items: [
-                        {
-                            id: 3,
-                            name: 'Modern Roundness Light',
-                            image: '/src/assets/img/roundness-light.png',
-                            quantity: 2,
-                            price: 124.99
-                        }
-                    ],
-                    shippingAddress: '123 Main St, City, State 12345',
-                    trackingNumber: 'TRK67890'
+            // Fetch real orders from backend
+            const token = localStorage.getItem('authToken')
+            const response = await fetch('http://localhost:5000/api/orders', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
-            ]
-            setOrders(demoOrders)
+            })
+            const result = await response.json()
+            if (result.success && Array.isArray(result.orders)) {
+                setOrders(result.orders)
+            } else {
+                setOrders([])
+            }
         } catch (error) {
             console.error('Error fetching orders:', error)
+            setOrders([])
         } finally {
             setLoading(false)
         }
