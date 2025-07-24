@@ -22,5 +22,16 @@
     "email": "satyarthrdx@gmail.com",
     "password": "$2b$12$tNIX3ACYOKW9x9UcxiTN9.xH0N0BHMDhvVzOIfn/1qhVs7cnHreQW",
     "createdAt": "2025-07-19T13:05:17.807Z"
+  },
+  {
+    "id": "2f6965ba-3432-428a-9959-cbe28a81b654",
+    "firstName": "jhon",
+    "lastName": "doe",
+    "email": "satyarthranjan4488@gmail.com",
+    "password": "$2b$12$BRsCfc4MIPyJ/T8mX3lwIO3lPAX8bH/O2XzExA2Gx1MKn6zPUqcvu",
+    "emailVerified": false,
+    "emailVerificationToken": "XLQCAG",
+    "emailVerificationExpires": "2025-07-25T13:40:06.039Z",
+    "createdAt": "2025-07-24T13:40:06.039Z"
   }
 ]
