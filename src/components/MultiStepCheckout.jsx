@@ -58,7 +58,8 @@ const MultiStepCheckout = ({ cartItems = [], totals = {} }) => {
         })),
         total: totals.total
       }
-      const token = localStorage.getItem('authToken')
+      const token = localStorage.getItem('authToken');
+      console.log('Order placement token:', token);
       const result = await ApiService.post('/checkout', payload, token)
       if (result.orderId) {
         setOrderId(result.orderId)
