@@ -420,26 +420,36 @@ app.post('/api/contact', (req, res) => {
 
 // Checkout/Order endpoint
 app.post('/api/checkout', authenticateToken, (req, res) => {
-  const { customerInfo, items, total } = req.body
-  if (!customerInfo || !items || items.length === 0) {
-    return res.status(400).json({ success: false, message: 'Customer information and items are required' })
+  try {
+    console.log('--- /api/checkout called ---')
+    console.log('req.user:', req.user)
+    console.log('req.body:', req.body)
+    const { customerInfo, items, total } = req.body
+    if (!customerInfo || !items || items.length === 0) {
+      console.log('Invalid payload: missing customerInfo or items')
+      return res.status(400).json({ success: false, message: 'Customer information and items are required' })
+    }
+    const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    const userId = req.user?.id || customerInfo.email || 'guest'
+    const newOrder = {
+      id: orderId,
+      userId,
+      customer: customerInfo,
+      items,
+      total,
+      status: 'pending',
+      date: new Date().toISOString(),
+      estimatedDelivery: '5-7 business days'
+    }
+    console.log('Saving new order:', newOrder)
+    const orders = loadOrders()
+    orders.push(newOrder)
+    saveOrders(orders)
+    res.json({ success: true, message: 'Order placed successfully', orderId, estimatedDelivery: newOrder.estimatedDelivery })
+  } catch (err) {
+    console.error('Error in /api/checkout:', err)
+    res.status(500).json({ success: false, message: 'Internal server error', error: err.message })
   }
-  const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-  const userId = req.user?.id || customerInfo.email || 'guest'
-  const newOrder = {
-    id: orderId,
-    userId,
-    customer: customerInfo,
-    items,
-    total,
-    status: 'pending',
-    date: new Date().toISOString(),
-    estimatedDelivery: '5-7 business days'
-  }
-  const orders = loadOrders()
-  orders.push(newOrder)
-  saveOrders(orders)
-  res.json({ success: true, message: 'Order placed successfully', orderId, estimatedDelivery: newOrder.estimatedDelivery })
 })
 
 // Get all orders for authenticated user
