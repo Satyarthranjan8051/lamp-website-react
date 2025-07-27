@@ -8,7 +8,7 @@ const Products = () => {
       name: "Stickness Light",
       category: "Desk Lamp",
       price: 45.99,
-      image: "/src/assets/img/stickness-light.png",
+      image: "/img/stickness-light.png",
       badge: "New"
     },
     {
@@ -16,7 +16,7 @@ const Products = () => {
       name: "Roundness Light",
       category: "Ceiling Lamp",
       price: 89.99,
-      image: "/src/assets/img/roundness-light.png",
+      image: "/img/roundness-light.png",
       badge: "Popular"
     },
     {
@@ -24,7 +24,7 @@ const Products = () => {
       name: "Nakedness Lamp",
       category: "Floor Lamp",
       price: 129.99,
-      image: "/src/assets/img/nakedness-lamp.png",
+      image: "/img/nakedness-lamp.png",
       badge: "Sale"
     },
     {
@@ -32,7 +32,7 @@ const Products = () => {
       name: "SuperJet Light",
       category: "Wall Lamp",
       price: 79.99,
-      image: "/src/assets/img/superjet-light.png",
+      image: "/img/superjet-light.png",
       badge: "Hot"
     },
     {
@@ -40,7 +40,7 @@ const Products = () => {
       name: "Features Lamp",
       category: "Smart Lamp",
       price: 159.99,
-      image: "/src/assets/img/features-lamp.png",
+      image: "/img/features-lamp.png",
       badge: "Smart"
     },
     {
@@ -48,7 +48,7 @@ const Products = () => {
       name: "Modern Industrial",
       category: "Industrial",
       price: 199.99,
-      image: "/src/assets/img/industrial-lamp.png",
+      image: "/img/industrial-lamp.png",
       badge: "Premium"
     }
   ]

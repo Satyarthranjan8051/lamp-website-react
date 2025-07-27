@@ -54,7 +54,7 @@ const Home = () => {
           <div className="relative">
             <div className="w-80 h-80 md:w-96 md:h-96 bg-hero-gradient rounded-full opacity-20 absolute -top-10 -left-10 animate-pulse"></div>
             <img 
-              src="/src/assets/img/home-lamp.png" 
+              src="/img/home-lamp.png" 
               alt="Modern Lamp" 
               className="relative z-10 w-80 md:w-96 drop-shadow-2xl"
             />

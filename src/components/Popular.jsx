@@ -18,7 +18,7 @@ const Popular = () => {
       category: "Industrial",
       price: 89.99,
       originalPrice: 120.00,
-      image: "/src/assets/img/industrial-lamp.png",
+      image: "/img/industrial-lamp.png",
       rating: 4.8
     },
     {
@@ -27,7 +27,7 @@ const Popular = () => {
       category: "Desk Lamp",
       price: 129.99,
       originalPrice: 160.00,
-      image: "/src/assets/img/ultrawide-lamp.png",
+      image: "/img/ultrawide-lamp.png",
       rating: 4.9
     },
     {
@@ -36,7 +36,7 @@ const Popular = () => {
       category: "Table Lamp",
       price: 69.99,
       originalPrice: 90.00,
-      image: "/src/assets/img/modern-lamp.png",
+      image: "/img/modern-lamp.png",
       rating: 4.7
     },
     {
@@ -45,7 +45,7 @@ const Popular = () => {
       category: "Floor Lamp",
       price: 199.99,
       originalPrice: 250.00,
-      image: "/src/assets/img/superbolw-lamp.png",
+      image: "/img/superbolw-lamp.png",
       rating: 4.9
     }
   ]

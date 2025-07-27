@@ -217,7 +217,7 @@ const Join = () => {
               <div className="absolute -top-10 -right-10 w-72 h-72 bg-third-gradient rounded-full opacity-20 blur-3xl animate-pulse"></div>
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-hero-gradient rounded-full opacity-5 animate-spin-slow"></div>
               <img
-                src="/src/assets/img/join-lamp.png"
+                src="/img/join-lamp.png"
                 alt="Join Newsletter"
                 className="relative z-10 w-full max-w-md mx-auto drop-shadow-2xl transform hover:scale-105 transition-transform duration-500"
               />

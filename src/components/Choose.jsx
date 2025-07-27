@@ -31,7 +31,7 @@ const Choose = () => {
             <div className="relative">
               <div className="absolute -top-10 -left-10 w-72 h-72 bg-second-gradient rounded-full opacity-10"></div>
               <img
-                src="/src/assets/img/choose-lamp.png"
+                src="/img/choose-lamp.png"
                 alt="Choose Our Lamps"
                 className="relative z-10 w-full max-w-md mx-auto drop-shadow-2xl"
               />
