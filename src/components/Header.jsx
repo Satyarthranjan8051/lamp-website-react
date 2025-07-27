@@ -25,29 +25,49 @@ const Header = ({ darkMode, toggleDarkMode }) => {
       }
     }
 
+    // Listen for custom event to set active nav link from other components
+    const handleSetActiveNavLink = (e) => {
+      setActiveLink(e.detail)
+    }
+
     window.addEventListener('scroll', handleScroll)
     document.addEventListener('click', handleClickOutside)
+    window.addEventListener('setActiveNavLink', handleSetActiveNavLink)
     
     return () => {
       window.removeEventListener('scroll', handleScroll)
       document.removeEventListener('click', handleClickOutside)
+      window.removeEventListener('setActiveNavLink', handleSetActiveNavLink)
     }
   }, [])
 
   const handleLinkClick = (href) => {
     setActiveLink(href)
     setShowMenu(false)
-    
-    // Check if it's the products page link
+
+    // If it's the products page link
     if (href === '/products') {
       navigate('/products')
       return
     }
-    
+
+    // If it's the popular section and not on home, set active and scroll after navigation
+    if (href === '#popular' && location.pathname !== '/') {
+      navigate('/')
+      setTimeout(() => {
+        const event = new CustomEvent('setActiveNavLink', { detail: '#popular' })
+        window.dispatchEvent(event)
+        const element = document.querySelector('#popular')
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' })
+        }
+      }, 100)
+      return
+    }
+
     // If we're not on the home page, navigate to home first
     if (location.pathname !== '/') {
       navigate('/')
-      // Small delay to allow navigation to complete before scrolling
       setTimeout(() => {
         const element = document.querySelector(href)
         if (element) {
@@ -97,9 +117,12 @@ const Header = ({ darkMode, toggleDarkMode }) => {
         : 'bg-white/90 backdrop-blur-sm dark:bg-gray-900/90'
     }`} id="header">
       <nav className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-        <a href="#" className="text-xl font-semibold text-gray-900 dark:text-white font-secondary">
+        <span
+          className="cursor-pointer text-xl font-semibold text-gray-900 dark:text-white font-secondary"
+          onClick={() => navigate('/')}
+        >
           SUN<span className="bg-hero-gradient bg-clip-text text-transparent">LIGHT</span>
-        </a>
+        </span>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">

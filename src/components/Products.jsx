@@ -1,7 +1,9 @@
 import { useCart } from '../context/CartContext'
+import { useNavigate } from 'react-router-dom'
 
 const Products = () => {
   const { addToCart, getItemQuantity } = useCart()
+  const navigate = useNavigate()
   const products = [
     {
       id: 1,
@@ -122,7 +124,15 @@ const Products = () => {
         </div>
 
         <div className="text-center mt-12">
-          <button className="bg-hero-gradient text-white px-8 py-3 rounded-lg hover:opacity-90 transition-opacity">
+          <button
+            className="bg-hero-gradient text-white px-8 py-3 rounded-lg hover:opacity-90 transition-opacity"
+            onClick={() => {
+              // Set active navbar link to 'Shop All' when navigating
+              const event = new CustomEvent('setActiveNavLink', { detail: '/products' })
+              window.dispatchEvent(event)
+              navigate('/products')
+            }}
+          >
             View All Products
           </button>
         </div>
