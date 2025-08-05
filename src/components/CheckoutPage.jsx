@@ -105,6 +105,7 @@ const CheckoutPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <input
                         type="text"
+                        id="firstName"
                         name="firstName"
                         placeholder="First Name"
                         value={formData.firstName}
@@ -114,6 +115,7 @@ const CheckoutPage = () => {
                       />
                       <input
                         type="text"
+                        id="lastName"
                         name="lastName"
                         placeholder="Last Name"
                         value={formData.lastName}
@@ -123,6 +125,7 @@ const CheckoutPage = () => {
                       />
                       <input
                         type="email"
+                        id="email"
                         name="email"
                         placeholder="Email"
                         value={formData.email}
@@ -132,6 +135,7 @@ const CheckoutPage = () => {
                       />
                       <input
                         type="tel"
+                        id="phone"
                         name="phone"
                         placeholder="Phone"
                         value={formData.phone}
@@ -148,6 +152,7 @@ const CheckoutPage = () => {
                     <div className="space-y-4">
                       <input
                         type="text"
+                        id="address"
                         name="address"
                         placeholder="Street Address"
                         value={formData.address}
@@ -158,6 +163,7 @@ const CheckoutPage = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
                           type="text"
+                          id="city"
                           name="city"
                           placeholder="City"
                           value={formData.city}
@@ -167,6 +173,7 @@ const CheckoutPage = () => {
                         />
                         <input
                           type="text"
+                          id="zipCode"
                           name="zipCode"
                           placeholder="ZIP Code"
                           value={formData.zipCode}
@@ -184,6 +191,7 @@ const CheckoutPage = () => {
                     <div className="space-y-4">
                       <input
                         type="text"
+                        id="cardNumber"
                         name="cardNumber"
                         placeholder="Card Number (1234 5678 9012 3456)"
                         value={formData.cardNumber}
@@ -194,6 +202,7 @@ const CheckoutPage = () => {
                       <div className="grid grid-cols-2 gap-4">
                         <input
                           type="text"
+                          id="expiryDate"
                           name="expiryDate"
                           placeholder="MM/YY"
                           value={formData.expiryDate}
