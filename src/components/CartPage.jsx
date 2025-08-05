@@ -50,7 +50,7 @@ const CartPage = () => {
   }, [toast])
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 relative">
+    <div className="min-h-screen bg-white dark:bg-gray-900 relative pt-16 md:pt-20 w-full max-w-full overflow-x-hidden">
       {/* Toast Notification */}
       {toast && (
         <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300
@@ -141,18 +141,18 @@ const CartPage = () => {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Items in Cart</h2>
                   <div className="space-y-6">
                     {items.map((item) => (
-                      <div key={item.id} className="flex items-center gap-6 p-4 border border-gray-100 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                      <div key={item.id} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-4 border border-gray-100 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                         <img
                           src={item.image}
                           alt={item.name}
                           className="w-24 h-24 object-contain rounded-lg border-2 border-primary-100 shadow-sm"
                         />
-                        <div className="flex-1">
+                        <div className="flex-1 w-full flex flex-col items-center text-center sm:items-start sm:text-left">
                           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
                             {item.name}
                           </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{item.category}</p>
-                          <div className="flex items-center gap-4">
+                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4">
                             <p className="text-lg font-semibold text-primary-500">${item.price}</p>
                             <span className="text-sm text-gray-400">× {item.quantity}</span>
                             <p className="text-lg font-bold text-gray-900 dark:text-white">
@@ -160,9 +160,9 @@ const CartPage = () => {
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row items-stretch gap-2 sm:gap-4 mt-4 sm:mt-0">
                           {/* Quantity Controls */}
-                          <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-2">
+                          <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-2 justify-center">
                             <button
                               onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                               className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -184,7 +184,7 @@ const CartPage = () => {
                           {/* Remove Button */}
                           <button
                             onClick={() => handleRemove(item.id)}
-                            className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors w-full sm:w-auto"
                             title="Remove item"
                             aria-label={`Remove ${item.name} from cart`}
                           >
@@ -198,7 +198,7 @@ const CartPage = () => {
               </div>
 
               {/* Cart Actions */}
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => navigate('/')}
                   className="flex-1 border border-primary-500 text-primary-600 dark:border-primary-400 dark:text-primary-300 py-3 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors font-semibold shadow-sm"
@@ -208,7 +208,7 @@ const CartPage = () => {
                 </button>
                 <button
                   onClick={handleClearCart}
-                  className="px-6 border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 py-3 rounded-lg transition-colors font-medium shadow-sm"
+                  className="flex-1 px-6 border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 py-3 rounded-lg transition-colors font-medium shadow-sm"
                   aria-label="Clear cart"
                 >
                   <i className="ri-delete-bin-line mr-2"></i>Clear Cart
