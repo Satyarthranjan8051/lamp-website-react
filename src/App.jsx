@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
 import Header from './components/Header'
@@ -23,6 +23,20 @@ import ScrollReveal from 'scrollreveal'
 
 function App() {
   const [darkMode, setDarkMode] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Ensure only one overlay is open at a time
+  const openCart = () => {
+    setIsCartOpen(true);
+    setIsMenuOpen(false);
+  };
+  const closeCart = () => setIsCartOpen(false);
+  const openMenu = () => {
+    setIsMenuOpen(true);
+    setIsCartOpen(false);
+  };
+  const closeMenu = () => setIsMenuOpen(false);
 
   useEffect(() => {
     // Check for saved theme preference
@@ -56,38 +70,102 @@ function App() {
     localStorage.setItem('sunlight-theme', newDarkMode ? 'dark' : 'light')
   }
 
+  const Layout = () => {
+    const location = useLocation();
+    const hideQuickCart = location.pathname === '/cart' || location.pathname === '/checkout';
+    return (
+      <div className={`${darkMode ? 'dark' : ''}`}>
+        <Header
+          darkMode={darkMode}
+          toggleDarkMode={toggleDarkMode}
+          isMenuOpen={isMenuOpen}
+          openMenu={openMenu}
+          closeMenu={closeMenu}
+          openCart={openCart}
+          isCartOpen={isCartOpen}
+          closeCart={closeCart}
+        />
+        <Outlet />
+        <CartSyncIndicator />
+        {!hideQuickCart && (
+          <QuickCart
+            isCartOpen={isCartOpen}
+            openCart={openCart}
+            closeCart={closeCart}
+            openMenu={openMenu}
+            isMenuOpen={isMenuOpen}
+            closeMenu={closeMenu}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Enable React Router v7 startTransition flag to silence warning and prepare for v7
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Layout />,
+      children: [
+        {
+          index: true,
+          element: (
+            <>
+              <main className="main">
+                <Home />
+                <Popular />
+                <Choose />
+                <Products />
+                <Join />
+              </main>
+              <Footer />
+            </>
+          ),
+        },
+        {
+          path: "cart",
+          element: <CartPage />,
+        },
+        {
+          path: "checkout",
+          element: <CheckoutPage />,
+        },
+        {
+          path: "products",
+          element: <ProductsPage />,
+        },
+        {
+          path: "signin",
+          element: <SignIn />,
+        },
+        {
+          path: "signup",
+          element: <SignUp />,
+        },
+        {
+          path: "orders",
+          element: <Orders />,
+        },
+        {
+          path: "profile",
+          element: <Profile />,
+        },
+        {
+          path: "newsletter-admin",
+          element: <NewsletterAdmin />,
+        },
+      ],
+    },
+  ], {
+    future: {
+      v7_startTransition: true,
+    },
+  })
+
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
-          <div className={`${darkMode ? 'dark' : ''}`}>
-            <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-            <Routes>
-              <Route path="/" element={
-                <>
-                  <main className="main">
-                    <Home />
-                    <Popular />
-                    <Choose />
-                    <Products />
-                    <Join />
-                  </main>
-                  <Footer />
-                  <QuickCart />
-                </>
-              } />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/products" element={<ProductsPage />} />
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/newsletter-admin" element={<NewsletterAdmin />} />
-            </Routes>
-            <CartSyncIndicator />
-          </div>
-        </Router>
+        <RouterProvider router={router} />
       </CartProvider>
     </AuthProvider>
   )

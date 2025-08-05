@@ -3,8 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 
-const Header = ({ darkMode, toggleDarkMode }) => {
-  const [showMenu, setShowMenu] = useState(false)
+const Header = ({ darkMode, toggleDarkMode, isMenuOpen, openMenu, closeMenu, openCart, isCartOpen, closeCart }) => {
   const [scrollHeader, setScrollHeader] = useState(false)
   const [activeLink, setActiveLink] = useState('#home')
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -42,43 +41,34 @@ const Header = ({ darkMode, toggleDarkMode }) => {
   }, [])
 
   const handleLinkClick = (href) => {
-    setActiveLink(href)
-    setShowMenu(false)
+    setActiveLink(href);
+    if (typeof closeMenu === 'function') closeMenu();
 
     // If it's the products page link
     if (href === '/products') {
-      navigate('/products')
-      return
+      navigate('/products');
+      return;
     }
 
-    // If it's the popular section and not on home, set active and scroll after navigation
-    if (href === '#popular' && location.pathname !== '/') {
-      navigate('/')
-      setTimeout(() => {
-        const event = new CustomEvent('setActiveNavLink', { detail: '#popular' })
-        window.dispatchEvent(event)
-        const element = document.querySelector('#popular')
+    // If it's a section link (starts with #)
+    if (href.startsWith('#')) {
+      if (location.pathname !== '/') {
+        navigate('/');
+        setTimeout(() => {
+          const event = new CustomEvent('setActiveNavLink', { detail: href });
+          window.dispatchEvent(event);
+          const element = document.querySelector(href);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      } else {
+        const element = document.querySelector(href);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth' })
+          element.scrollIntoView({ behavior: 'smooth' });
         }
-      }, 100)
-      return
-    }
-
-    // If we're not on the home page, navigate to home first
-    if (location.pathname !== '/') {
-      navigate('/')
-      setTimeout(() => {
-        const element = document.querySelector(href)
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' })
-        }
-      }, 100)
-    } else {
-      const element = document.querySelector(href)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
       }
+      return;
     }
   }
 
@@ -111,22 +101,30 @@ const Header = ({ darkMode, toggleDarkMode }) => {
   }
 
   return (
-    <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-400 ${
-      scrollHeader 
-        ? 'bg-white/95 backdrop-blur-3xl shadow-lg dark:bg-gray-900/95' 
-        : 'bg-white/90 backdrop-blur-sm dark:bg-gray-900/90'
-    }`} id="header">
-      <nav className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+    <>
+      {/* Mobile Menu Backdrop */}
+      {isMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm md:hidden z-40"
+          onClick={closeMenu}
+        />
+      )}
+      <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-400 ${
+        scrollHeader
+          ? 'bg-white/95 backdrop-blur-3xl shadow-lg dark:bg-gray-900/95'
+          : 'bg-white/90 backdrop-blur-sm dark:bg-gray-900/90'
+      }`} id="header">
+        <nav className="max-w-6xl mx-auto px-2 sm:px-4 h-14 flex items-center justify-between">
         <span
-          className="cursor-pointer text-xl font-semibold text-gray-900 dark:text-white font-secondary"
+          className="cursor-pointer text-lg sm:text-xl font-semibold text-gray-900 dark:text-white font-secondary"
           onClick={() => navigate('/')}
         >
           SUN<span className="bg-hero-gradient bg-clip-text text-transparent">LIGHT</span>
         </span>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-8">
-          <ul className="flex space-x-8">
+        <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
+          <ul className="flex space-x-4 lg:space-x-8">
             {[
               { href: '#home', text: 'Home' },
               { href: '#popular', text: 'Popular' },
@@ -236,8 +234,9 @@ const Header = ({ darkMode, toggleDarkMode }) => {
 
           {/* Cart Icon */}
           <button
-            onClick={handleCartClick}
+            onClick={() => navigate('/cart')}
             className="relative text-gray-900 dark:text-white text-xl hover:text-primary-500 transition-colors"
+            aria-label="Go to cart page"
           >
             <i className="ri-shopping-cart-line"></i>
             {getTotalItems() > 0 && (
@@ -257,121 +256,147 @@ const Header = ({ darkMode, toggleDarkMode }) => {
 
           {/* Mobile Menu Toggle */}
           <button
-            onClick={() => setShowMenu(!showMenu)}
+            onClick={() => {
+              if (isMenuOpen) {
+                closeMenu();
+              } else {
+                openMenu();
+              }
+            }}
             className="text-gray-900 dark:text-white text-xl md:hidden"
+            aria-label="Open menu"
           >
             <i className="ri-menu-line"></i>
           </button>
         </div>
 
-        {/* Mobile Menu */}
-        <div className={`fixed top-0 ${showMenu ? 'right-0' : '-right-full'} w-72 h-full bg-white dark:bg-gray-900 transition-all duration-300 md:hidden z-50 px-6 pt-16`}>
-          <button
-            onClick={() => setShowMenu(false)}
-            className="absolute top-4 right-6 text-2xl text-gray-600 dark:text-gray-300"
+        {/* Mobile Menu - Fullscreen Overlay (only show if menu is open and cart is NOT open) */}
+        {isMenuOpen && !isCartOpen && (
+          <div
+            className={`fixed inset-0 z-[999] md:hidden transition-transform duration-300 flex flex-col bg-white dark:bg-gray-900 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+            style={{ width: '100vw', height: '100vh', maxWidth: '100vw', maxHeight: '100vh' }}
           >
-            <i className="ri-close-line"></i>
-          </button>
-
-          {/* User Info (if logged in) */}
-          {isAuthenticated && (
-            <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-hero-gradient rounded-full flex items-center justify-center text-white font-medium">
-                  {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {user?.firstName} {user?.lastName}
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {user?.email}
-                  </p>
-                </div>
-              </div>
+            {/* Mobile Menu Header Bar */}
+            <div className="relative w-full flex items-center justify-between bg-white dark:bg-gray-900 shadow-md border-b border-gray-200 dark:border-gray-700 px-4 sm:px-8" style={{ minHeight: '56px', height: '56px' }}>
+              <span
+                className="cursor-pointer text-lg font-semibold text-gray-900 dark:text-white font-secondary"
+                onClick={() => { closeMenu(); navigate('/') }}
+              >
+                SUN<span className="bg-hero-gradient bg-clip-text text-transparent">LIGHT</span>
+              </span>
+              <button
+                onClick={closeMenu}
+                className="text-2xl text-gray-600 dark:text-gray-300"
+                aria-label="Close menu"
+              >
+                <i className="ri-close-line"></i>
+              </button>
             </div>
-          )}
 
-          <ul className="space-y-6">
-            {[
-              { href: '#home', text: 'Home' },
-              { href: '#popular', text: 'Popular' },
-              { href: '#choose', text: 'Choose' },
-              { href: '#products', text: 'Products' },
-              { href: '/products', text: 'Shop All' },
-            ].map((item) => (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  className={`block text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors ${
-                    activeLink === item.href ? 'text-primary-500' : ''
-                  }`}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleLinkClick(item.href)
-                  }}
-                >
-                  {item.text}
-                </a>
-              </li>
-            ))}
+            {/* Mobile Menu Content */}
+            <div className="flex-1 overflow-y-auto px-4 pt-6 pb-8">
+              {/* User Info (if logged in) */}
+              {isAuthenticated && (
+                <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-9 h-9 bg-hero-gradient rounded-full flex items-center justify-center text-white font-medium text-base">
+                      {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white text-base">
+                        {user?.firstName} {user?.lastName}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-            {/* Authentication Options */}
-            {isAuthenticated ? (
-              <>
-                <li>
-                  <button
-                    onClick={handleProfileClick}
-                    className="flex items-center space-x-3 text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors w-full text-left"
-                  >
-                    <i className="ri-user-line"></i>
-                    <span>Profile</span>
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={handleOrdersClick}
-                    className="flex items-center space-x-3 text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors w-full text-left"
-                  >
-                    <i className="ri-shopping-bag-line"></i>
-                    <span>Orders</span>
-                  </button>
-                </li>
-                <li className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors w-full text-left"
-                  >
-                    <i className="ri-logout-box-line"></i>
-                    <span>Sign Out</span>
-                  </button>
-                </li>
-              </>
-            ) : (
-              <>
-                <li className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <button
-                    onClick={handleSignInClick}
-                    className="flex items-center space-x-3 text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors w-full text-left"
-                  >
-                    <i className="ri-login-box-line"></i>
-                    <span>Sign In</span>
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={handleSignUpClick}
-                    className="w-full bg-hero-gradient text-white px-4 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity"
-                  >
-                    Sign Up
-                  </button>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
-      </nav>
-    </header>
+              <ul className="space-y-4">
+                {[
+                  { href: '#home', text: 'Home' },
+                  { href: '#popular', text: 'Popular' },
+                  { href: '#choose', text: 'Choose' },
+                  { href: '#products', text: 'Products' },
+                  { href: '/products', text: 'Shop All' },
+                ].map((item) => (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      className={`block text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors text-base sm:text-lg ${
+                        activeLink === item.href ? 'text-primary-500' : ''
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleLinkClick(item.href)
+                      }}
+                    >
+                      {item.text}
+                    </a>
+                  </li>
+                ))}
+
+                {/* Authentication Options */}
+                {isAuthenticated ? (
+                  <>
+                    <li>
+                      <button
+                        onClick={handleProfileClick}
+                        className="flex items-center space-x-3 text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors w-full text-left text-base"
+                      >
+                        <i className="ri-user-line"></i>
+                        <span>Profile</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={handleOrdersClick}
+                        className="flex items-center space-x-3 text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors w-full text-left text-base"
+                      >
+                        <i className="ri-shopping-bag-line"></i>
+                        <span>Orders</span>
+                      </button>
+                    </li>
+                    <li className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center space-x-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors w-full text-left text-base"
+                      >
+                        <i className="ri-logout-box-line"></i>
+                        <span>Sign Out</span>
+                      </button>
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <button
+                        onClick={handleSignInClick}
+                        className="flex items-center space-x-3 text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors w-full text-left text-base"
+                      >
+                        <i className="ri-login-box-line"></i>
+                        <span>Sign In</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={handleSignUpClick}
+                        className="w-full bg-hero-gradient text-white px-4 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity text-base"
+                      >
+                        Sign Up
+                      </button>
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
+          </div>
+        )}
+        </nav>
+      </header>
+    </>
   )
 }
 
